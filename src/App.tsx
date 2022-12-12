@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import * as C from "./app.styled";
 import { InfoArea } from "./shared/components/InfoArea";
+import { InputArea } from "./shared/components/InputArea";
 import { TableArea } from "./shared/components/TableArea";
 import { categories } from "./shared/data/categories";
 import { items } from "./shared/data/items";
@@ -38,6 +39,16 @@ export const App = () => {
     setCurrentMonth(newMonth);
   };
 
+  const handleAddItem = (
+    date: Date,
+    category: string,
+    title: string,
+    value: number
+  ) => {
+    const newList = list;
+    newList.push({date,category,title,value})
+  };
+
   return (
     <C.Container>
       <C.Header>
@@ -53,6 +64,7 @@ export const App = () => {
         />
 
         {/*Área de inserção */}
+        <InputArea handleAddItem={handleAddItem} />
 
         {/*Tabela de itens */}
         <TableArea list={filteredList} />
