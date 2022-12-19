@@ -39,14 +39,10 @@ export const App = () => {
     setCurrentMonth(newMonth);
   };
 
-  const handleAddItem = (
-    date: Date,
-    category: string,
-    title: string,
-    value: number
-  ) => {
-    const newList = list;
-    newList.push({date,category,title,value})
+  const handleAddItem = (item: Item) => {
+    const newList = [...list];
+    newList.push(item)
+    setList(newList);
   };
 
   return (

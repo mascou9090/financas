@@ -51,3 +51,8 @@ export const formatCurrentMonth = (currentMonth: string): string => {
   ];
   return `${months[parseInt(month)-1]} de ${year}`
 };
+
+export const newDateAdjusted = (currentMes: string) => {
+  let [year, month, day] = currentMes.split("-");
+  return new Date(parseInt(year), parseInt(month) -1, parseInt(day));
+}

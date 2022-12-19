@@ -1,13 +1,11 @@
 import { useState } from "react";
+import { categories } from "../../data/categories";
+import { newDateAdjusted } from "../../helpers/dateFilter";
+import { Item } from "../../types/Item";
 import * as C from "./style";
 
 type Props = {
-  handleAddItem: (
-    date: Date,
-    category: string,
-    title: string,
-    value: number
-  ) => void;
+  handleAddItem: (item: Item) => void;
 };
 
 export const InputArea = ({ handleAddItem }: Props) => {
@@ -15,60 +13,73 @@ export const InputArea = ({ handleAddItem }: Props) => {
   const [currentCategory, setCurrentCategory] = useState("");
   const [currentTitle, setCurrentTitle] = useState("");
   const [currentValue, setCurrentValue] = useState(0);
-  const [currentExpense, setCurrentExpense] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLInputElement>) => {
-    e.preventDefault();
+  let categoryKeys: string[] = Object.keys(categories);
 
-    const dataMesNow = new Date(currentMes)
+  const handleAddEvent = () => {
+    let errors: string[] = [];
 
-    handleAddItem(dataMesNow, currentCategory, currentTitle, currentValue);
-  };
+    if(isNaN(new Date(currentMes).getTime())) {
+      errors.push('Data inválida!');
+    }
+    if(!categoryKeys.includes(currentCategory)) {
+      errors.push('Categoria inválida!');
+    }
+    if(currentTitle === '') {
+      errors.push('Título vazio!');
+    }
+    if(currentValue <= 0) {
+      errors.push('Valor inválido!');
+    }
+    if(errors.length > 0) {
+      alert(errors.join('\n'));
+    } else {
+      handleAddItem({
+        data: newDateAdjusted(currentMes),
+        category: currentCategory,
+        title: currentTitle,
+        value: currentValue,
+      });
+      clearFields();
+    }
+  }
 
-  const handleClick = () => {
-    setCurrentExpense(!false);
-  };
+  const clearFields = () => {
+    setCurrentMes('');
+    setCurrentCategory('');
+    setCurrentTitle('');
+    setCurrentValue(0);
+  }
 
   return (
     <C.Container>
-      <form onSubmit={() => handleSubmit}>
-        <input
-          onChange={(e) => setCurrentMes(e.target.value)}
-          type="text"
-          name="mes"
-          placeholder="yyyy/mm/dd"
-          value={currentMes}
-        />
-        <input
-          onChange={(e) => setCurrentCategory(e.target.value)}
-          type="text"
-          name="category"
-          placeholder="Categoria"
-          value={currentCategory}
-        />
-        <input
-          onChange={(e) => setCurrentTitle(e.target.value)}
-          type="text"
-          name="title"
-          placeholder="Título"
-          value={currentTitle}
-        />
-        <input
-          onChange={(e) => setCurrentValue(parseFloat(e.target.value))}
-          type="text"
-          name="value"
-          placeholder="Valor"
-          value={currentValue}
-        />
-        <label>Receita</label>
-        <input
-          className="radios"
-          onClick={() => handleClick}
-          type="checkbox"
-          name="receita"
-        />
-        <button type="submit">Enviar</button>
-      </form>
-    </C.Container>
+        <C.InputLabel>
+          <C.InputTitle>Data</C.InputTitle>
+          <C.Input type="date" value={currentMes} onChange={e => setCurrentMes(e.target.value)} />
+        </C.InputLabel>
+        <C.InputLabel>
+          <C.InputTitle>Categoria</C.InputTitle>
+          <C.Select value={currentCategory} onChange={e => setCurrentCategory(e.target.value)}>
+            <>
+              <option></option>
+              {categoryKeys.map((key, index) => (
+                <option key={index} value={key}>{categories[key].title}</option>
+              ))}
+            </>
+          </C.Select>
+        </C.InputLabel>
+        <C.InputLabel>
+          <C.InputTitle>Título</C.InputTitle>
+          <C.Input type="text" value={currentTitle} onChange={e => setCurrentTitle(e.target.value)} />
+        </C.InputLabel>
+        <C.InputLabel>
+          <C.InputTitle>Valor</C.InputTitle>
+          <C.Input type="number" value={currentValue} onChange={e => setCurrentValue(parseFloat(e.target.value))} />
+        </C.InputLabel>
+        <C.InputLabel>
+          <C.InputTitle>&nbsp;</C.InputTitle>
+          <C.Button onClick={handleAddEvent}>Adicionar</C.Button>
+        </C.InputLabel>
+      </C.Container>
   );
 };
